@@ -3,14 +3,13 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from app.model import TfidfJobMatcher
 from app.preprocess import clean_text
+from app.pdf_utils import extract_text_advanced
 from app.skill_extractor import extract_skills_spacy
-from typing import List
+from io import BytesIO
 import uvicorn
 import os
-from io import BytesIO
-from app.pdf_utils import extract_text_advanced
 
-app = FastAPI(title="Job Recommendation API")
+app = FastAPI(title="Job Recommendation API (Real Jobs)")
 
 # Allow connections from any frontend (e.g., Angular or React)
 app.add_middleware(
@@ -28,45 +27,28 @@ if os.path.exists(MODEL_DIR):
     try:
         matcher = TfidfJobMatcher()
         matcher.load(MODEL_DIR)
-        print("Model loaded successfully.")
+        print("✅ Model loaded successfully (Real Jobs).")
     except Exception as e:
         matcher = None
-        print(f"Error loading model: {str(e)}")
-        print("Run scripts/train.py first to create the model.")
+        print(f"❌ Error loading model: {str(e)}")
+        print("⚠️ Run scripts/train.py first to create the model.")
 else:
-    print("Model not found. Run scripts/train.py first.")
+    print("⚠️ Model not found. Run scripts/train.py first.")
 
-# Basic list of common skills (can be expanded later)
-COMMON_SKILLS = [
-    "python", "java", "c++", "sql", "excel", "pandas", "react", "angular",
-    "node.js", "machine learning", "deep learning", "data analysis",
-    "django", "flask", "html", "css", "javascript", "linux", "git", "aws"
-]
 
-# -------------------------------------
-# Helper Functions
-# -------------------------------------
-
+# Extract text from CV PDF
 async def extract_text_from_pdf(file: UploadFile) -> str:
     contents = BytesIO(await file.read())
     return extract_text_advanced(contents)
 
-def extract_skills(text: str) -> List[str]:
-    """Extract skills from text (basic initial method)"""
-    text_lower = text.lower()
-    found = [skill for skill in COMMON_SKILLS if skill in text_lower]
-    return sorted(set(found))
 
-# -------------------------------------
-# Main API Endpoint
-# -------------------------------------
-
+# Main endpoint for uploading CV
 @app.post("/upload_cv_pdf")
 async def upload_cv_pdf(file: UploadFile = File(...), top_k: int = 5):
     """
     User uploads a CV in PDF format.
-    The system extracts the text and skills,
-    then matches them with jobs from the model and returns the top results.
+    The system extracts text and skills,
+    then matches them with real jobs from the model.
     """
     if matcher is None:
         return {"error": "Model not loaded. Run scripts/train.py first."}
@@ -79,13 +61,13 @@ async def upload_cv_pdf(file: UploadFile = File(...), top_k: int = 5):
     except Exception as e:
         return {"error": f"Error processing PDF: {str(e)}"}
 
-    # Get the best job matches
+    # Get job recommendations
     try:
         results = matcher.recommend(cleaned, top_k=top_k)
     except Exception as e:
         return {"error": f"Error generating recommendations: {str(e)}"}
 
-    # Prepare the final response
+    # Prepare response
     response = {
         "extracted_skills": skills,
         "matches_found": len(results),
@@ -93,21 +75,20 @@ async def upload_cv_pdf(file: UploadFile = File(...), top_k: int = 5):
     }
 
     for r in results:
-        job_info = {
-            "title": r.get("title", "N/A"),
-            "company": r["meta"].get("company", "Unknown"),
-            "category": r["meta"].get("category", "Unspecified"),
-            "location": r["meta"].get("location", "Not provided"),
-            "score": round(r["score"], 3),
-            "job_text": r["job_text"]
-        }
-        response["top_matches"].append(job_info)
+        meta = r.get("meta", {})
+        response["top_matches"].append({
+            "title": meta.get("title", "N/A"),
+            "company": meta.get("company", "Unknown"),
+            "category": meta.get("category", "Unspecified"),
+            "location": meta.get("location", "Not provided"),
+            "score": round(r.get("score", 0.0), 3),
+            "apply_link": meta.get("url", "N/A"),
+            "job_text": r.get("job_text", "")[:400]  # First 400 characters of description
+        })
 
     return response
 
-# -------------------------------------
-# Run the server
-# -------------------------------------
 
+# Run the server locally
 if __name__ == "__main__":
     uvicorn.run("api.api:app", host="0.0.0.0", port=8000, reload=True)
