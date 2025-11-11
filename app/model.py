@@ -10,7 +10,7 @@ class TfidfJobMatcher:
     def __init__(self, max_features: int = 5000, stop_words: Optional[str] = "english"):
         self.vectorizer = TfidfVectorizer(max_features=max_features, stop_words=stop_words)
         self.job_texts: List[str] = []
-        self.job_meta: List[Dict] = []  # مثال: [{"id": 1, "title": "...", "raw": "..."}]
+        self.job_meta: List[Dict] = []  # Example: [{"id": 1, "title": "...", "raw": "..."}]
         self.job_vectors = None
         self.fitted = False
 
@@ -59,9 +59,18 @@ class TfidfJobMatcher:
         joblib.dump(self.fitted, os.path.join(path, "fitted.joblib"))
 
     def load(self, path: str):
-        self.vectorizer = joblib.load(os.path.join(path, "vectorizer.joblib"))
-        self.job_texts = joblib.load(os.path.join(path, "job_texts.joblib"))
-        self.job_meta = joblib.load(os.path.join(path, "job_meta.joblib"))
-        self.job_vectors = joblib.load(os.path.join(path, "job_vectors.joblib"))
-        self.fitted = joblib.load(os.path.join(path, "fitted.joblib"))
+        required_files = ["vectorizer.joblib", "job_texts.joblib", "job_meta.joblib", "job_vectors.joblib", "fitted.joblib"]
+        for filename in required_files:
+            filepath = os.path.join(path, filename)
+            if not os.path.exists(filepath):
+                raise FileNotFoundError(f"Model file not found: {filepath}. Please train the model first.")
+        
+        try:
+            self.vectorizer = joblib.load(os.path.join(path, "vectorizer.joblib"))
+            self.job_texts = joblib.load(os.path.join(path, "job_texts.joblib"))
+            self.job_meta = joblib.load(os.path.join(path, "job_meta.joblib"))
+            self.job_vectors = joblib.load(os.path.join(path, "job_vectors.joblib"))
+            self.fitted = joblib.load(os.path.join(path, "fitted.joblib"))
+        except Exception as e:
+            raise RuntimeError(f"Error loading model files: {str(e)}")
         return self

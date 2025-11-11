@@ -6,3 +6,6 @@ fastapi
 uvicorn
 python-multipart
 pdfminer.six
+pdfplumber
+spacy
+requests

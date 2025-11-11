@@ -21,7 +21,7 @@ def main():
     df["job_clean"] = df["job_description_text"].fillna("").apply(clean_text)
 
     df[["resume_clean", "job_clean", "label"]].to_csv(SAVE_PATH, index=False)
-    print(f"file is saved{SAVE_PATH}")
+    print(f"File is saved: {SAVE_PATH}")
 
 if __name__ == "__main__":
     main()
