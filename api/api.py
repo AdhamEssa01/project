@@ -1,17 +1,15 @@
 # api/api.py
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from app.model import TfidfJobMatcher
-from app.preprocess import clean_text
-from app.pdf_utils import extract_text_advanced
-from app.skill_extractor import extract_skills_spacy
 from io import BytesIO
+from typing import Optional
 import uvicorn
-import os
 
-app = FastAPI(title="Job Recommendation API (Real Jobs)")
+from app.model import JobFitClassifier, load_model
+from app.pdf_utils import extract_text_advanced
 
-# Allow connections from any frontend (e.g., Angular or React)
+app = FastAPI(title="Job Fit Classification API")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,76 +17,56 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load the model
-MODEL_DIR = os.path.join(os.getcwd(), "saved_model")
-matcher = None
+classifier: Optional[JobFitClassifier] = None
 
-if os.path.exists(MODEL_DIR):
+
+def _load_classifier():
+    global classifier
     try:
-        matcher = TfidfJobMatcher()
-        matcher.load(MODEL_DIR)
-        print("✅ Model loaded successfully (Real Jobs).")
-    except Exception as e:
-        matcher = None
-        print(f"❌ Error loading model: {str(e)}")
-        print("⚠️ Run scripts/train.py first to create the model.")
-else:
-    print("⚠️ Model not found. Run scripts/train.py first.")
+        classifier = load_model()
+        print("Job Fit classifier loaded.")
+    except Exception as exc:
+        classifier = None
+        print(f"Failed to load classifier: {exc}")
+        print("Run scripts/train.py to generate saved_model/job_match_pipeline.joblib.")
 
 
-# Extract text from CV PDF
+@app.on_event("startup")
+def startup_event():
+    _load_classifier()
+
+
 async def extract_text_from_pdf(file: UploadFile) -> str:
     contents = BytesIO(await file.read())
     return extract_text_advanced(contents)
 
 
-# Main endpoint for uploading CV
-@app.post("/upload_cv_pdf")
-async def upload_cv_pdf(file: UploadFile = File(...), top_k: int = 5):
-    """
-    User uploads a CV in PDF format.
-    The system extracts text and skills,
-    then matches them with real jobs from the model.
-    """
-    if matcher is None:
-        return {"error": "Model not loaded. Run scripts/train.py first."}
+@app.post("/predict_fit")
+async def predict_fit(
+    resume_text_pdf: UploadFile = File(..., description="Resume PDF file"),
+    job_description_text: str = Form(..., description="Job description text"),
+):
+    if classifier is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Model not loaded. Run scripts/train.py first.",
+        )
 
-    # Extract and clean text
     try:
-        text = await extract_text_from_pdf(file)
-        cleaned = clean_text(text)
-        skills = extract_skills_spacy(cleaned)
-    except Exception as e:
-        return {"error": f"Error processing PDF: {str(e)}"}
+        resume_text = await extract_text_from_pdf(resume_text_pdf)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Error reading PDF: {exc}") from exc
 
-    # Get job recommendations
-    try:
-        results = matcher.recommend(cleaned, top_k=top_k)
-    except Exception as e:
-        return {"error": f"Error generating recommendations: {str(e)}"}
+    prediction, probabilities = classifier.predict(
+        resume_text=resume_text,
+        job_description_text=job_description_text,
+    )
 
-    # Prepare response
-    response = {
-        "extracted_skills": skills,
-        "matches_found": len(results),
-        "top_matches": []
+    return {
+        "predicted_fit": prediction,
+        "class_probabilities": probabilities,
     }
 
-    for r in results:
-        meta = r.get("meta", {})
-        response["top_matches"].append({
-            "title": meta.get("title", "N/A"),
-            "company": meta.get("company", "Unknown"),
-            "category": meta.get("category", "Unspecified"),
-            "location": meta.get("location", "Not provided"),
-            "score": round(r.get("score", 0.0), 3),
-            "apply_link": meta.get("url", "N/A"),
-            "job_text": r.get("job_text", "")[:400]  # First 400 characters of description
-        })
 
-    return response
-
-
-# Run the server locally
 if __name__ == "__main__":
     uvicorn.run("api.api:app", host="0.0.0.0", port=8000, reload=True)

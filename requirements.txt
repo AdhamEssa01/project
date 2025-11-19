@@ -2,29 +2,17 @@
 fastapi==0.115.0
 uvicorn==0.30.1
 
-# Machine Learning / NLP
+# Machine learning stack
 scikit-learn==1.5.2
 pandas==2.2.3
 numpy==1.26.4
-spacy==3.8.2
-sentence-transformers==3.0.1  # (optional upgrade if you move from TF-IDF)
+joblib==1.4.2
 
 # PDF text extraction
 pdfplumber==0.11.4
 pdfminer.six==20231228
 
 # Utilities
-joblib==1.4.2
-requests==2.32.3
 regex==2024.7.24
-
-# For cross-origin (frontend <-> backend)
 python-multipart==0.0.9
 aiofiles==24.1.0
-
-# Development helpers
-tqdm==4.66.5
-
-# Optional: Visualization (if you add charts later)
-matplotlib==3.9.2
-plotly==5.24.1
