@@ -28,7 +28,7 @@ def _load_classifier():
     except Exception as exc:
         classifier = None
         print(f"Failed to load classifier: {exc}")
-        print("Run scripts/train.py to generate saved_model/job_match_pipeline.joblib.")
+        print("Run scripts/train.py to generate saved_model/job_match_pipeline.joblib (TF-IDF vectorizer).")
 
 
 @app.on_event("startup")
@@ -57,14 +57,14 @@ async def predict_fit(
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Error reading PDF: {exc}") from exc
 
-    prediction, probabilities = classifier.predict(
+    classification, similarity_score = classifier.predict(
         resume_text=resume_text,
         job_description_text=job_description_text,
     )
 
     return {
-        "predicted_fit": prediction,
-        "class_probabilities": probabilities,
+        "similarity_score": similarity_score,
+        "classification": classification,
     }
 
 
