@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>JobFinder - Analyze Fit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="page-analyze">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <img class="imgLogo" src="./JobFinder Logo.png" alt="jobFinder logo">
+      </div>
+    </div>
+  </header>
+
+  <main class="analyze-main container">
+    <section class="analyze-hero">
+      <div class="hero-text">
+        <h1>Find out if a job<br />matches your CV</h1>
+        <p class="hero-description">
+          Upload your CV and the job description and let our AI measure the compatibility accurately.
+        </p>
+      </div>
+      <div class="hero-illustration">
+        <div class="hero-avatar">
+          <img class="avatar" class="person" src="./WhatsApp Image 2025-12-08 at 04.49.09_7dab5355.jpg" alt="">
+        </div>
+      </div>
+    </section>
+
+    <section class="card analyze-card">
+      <form id="analyzeForm" class="analyze-form">
+        <div class="form-group">
+          <label for="cvInput" class="form-label">
+            Upload CV (PDF / DOCX)
+          </label>
+          <input type="file" id="cvInput" name="cv_file" accept=".pdf,.doc,.docx" class="form-input file-input"
+            required />
+        </div>
+
+        <div class="form-group">
+          <label for="jobDescription" class="form-label">
+            Paste Job Description
+          </label>
+          <textarea id="jobDescription" name="job_description" rows="5" class="form-input textarea-input"
+            placeholder="Paste the job description here..." required></textarea>
+        </div>
+
+        <button type="submit" class="primary-btn full-width" id="analyzeBtn">
+          Analyze Fit
+        </button>
+
+        <p class="security-note">
+          Your files are processed securely and never stored.
+        </p>
+      </form>
+    </section>
+
+    <section id="resultSection" class="card result-card hidden">
+      <div class="result-row">
+        <span id="resultBadge" class="result-badge result-fit">Fit</span>
+        <span id="resultText" class="result-text">
+          Your CV matches this job well
+        </span>
+      </div>
+    </section>
+
+    <section class="bottom-actions">
+      <button id="tryAgainBtn" class="ghost-btn">
+        ⟳ Try again
+      </button>
+      <button id="homeBtn" class="ghost-btn">
+        ⌂ Home
+      </button>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

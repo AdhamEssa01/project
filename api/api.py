@@ -1,5 +1,6 @@
 # api/api.py
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from io import BytesIO
 from typing import Optional
@@ -41,7 +42,7 @@ async def extract_text_from_pdf(file: UploadFile) -> str:
     return extract_text_advanced(contents)
 
 
-@app.post("/predict_fit")
+@app.post("/job-fit")
 async def predict_fit(
     resume_text_pdf: UploadFile = File(..., description="Resume PDF file"),
     job_description_text: str = Form(..., description="Job description text"),
@@ -63,9 +64,41 @@ async def predict_fit(
     )
 
     return {
-        "similarity_score": similarity_score,
-        "classification": classification,
+        "label": classification,
+        "score": similarity_score,
     }
+
+
+class PredictRequest(BaseModel):
+    resume_text: Optional[str] = None
+    job_description_text: str
+
+
+@app.post("/predict_json")
+async def predict_json(payload: PredictRequest):
+    """Accept JSON payload with raw resume text and job description.
+
+    Example JSON:
+    {
+      "resume_text": "...",
+      "job_description_text": "..."
+    }
+    """
+    if classifier is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Model not loaded. Run scripts/train.py first.",
+        )
+
+    if not payload.resume_text:
+        raise HTTPException(status_code=400, detail="`resume_text` is required in JSON payload")
+
+    classification, similarity_score = classifier.predict(
+        resume_text=payload.resume_text,
+        job_description_text=payload.job_description_text,
+    )
+
+    return {"label": classification, "score": similarity_score}
 
 
 if __name__ == "__main__":
