@@ -16,8 +16,9 @@ body {
   background: #f9fbff;
 }
 
-img {
-  max-width: 100%;
+.imgLogo, 
+.phone {
+  max-width: 55%;
   display: block;
 }
 
@@ -212,6 +213,10 @@ button {
   background: linear-gradient(145deg, #bfdbfe, #e0e7ff);
 }
 
+.avatar {
+  max-width: 100%;
+  display: block;
+}
 /* Form */
 
 .analyze-card {
