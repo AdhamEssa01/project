@@ -1,13 +1,9 @@
-# app/preprocess.py
 import re
 
 def strip_html(text: str) -> str:
-    """Remove HTML tags from text"""
     if not isinstance(text, str):
         return ""
-    # Remove HTML tags
     text = re.sub(r'<[^>]+>', ' ', text)
-    # Decode common HTML entities
     text = text.replace('&nbsp;', ' ')
     text = text.replace('&amp;', '&')
     text = text.replace('&lt;', '<')
@@ -19,7 +15,6 @@ def strip_html(text: str) -> str:
 def clean_text(text: str) -> str:
     if not isinstance(text, str):
         return ""
-    # Strip HTML first if present
     text = strip_html(text)
     text = text.lower()
     text = text.replace("\n", " ").replace("\r", " ")

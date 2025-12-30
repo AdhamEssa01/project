@@ -1,20 +1,9 @@
-# run_evaluation.py
-"""
-Script to run evaluation on the trained model.
-
-This script demonstrates how to:
-1. Load the trained model
-2. Evaluate predictions on test data
-3. Show how similarity scores are matched to labels using thresholds
-"""
-
 import os
 import sys
 import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Add app directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'app'))
 
 from app.model import load_model
@@ -30,7 +19,6 @@ THRESHOLDS_FILENAME = "thresholds.json"
 
 
 def load_test_data():
-    """Load and preprocess test data."""
     if not os.path.exists(DATA_PATH):
         print(f"[error] Training data not found at {DATA_PATH}")
         return None, None
@@ -41,17 +29,14 @@ def load_test_data():
         print(f"[error] Missing required columns in {DATA_PATH}")
         return None, None
     
-    # Clean texts
     df["resume_clean"] = df["resume_text"].fillna("").apply(clean_text)
     df["job_clean"] = df["job_description_text"].fillna("").apply(clean_text)
     
-    # Filter out empty texts
     df = df[
         (df["resume_clean"].str.len() > 0) 
         & (df["job_clean"].str.len() > 0)
     ]
     
-    # Use a subset for evaluation (last 20% as test set)
     from sklearn.model_selection import train_test_split
     _, test_df = train_test_split(df, test_size=0.2, random_state=42, stratify=df.get("label", None))
     
@@ -59,14 +44,10 @@ def load_test_data():
 
 
 def explain_score_matching():
-    """
-    Explain how similarity scores are matched to labels using thresholds.
-    """
     print("\n" + "=" * 80)
     print("HOW SCORES ARE MATCHED TO LABELS")
     print("=" * 80)
     
-    # Load thresholds
     thresholds_path = os.path.join(MODEL_DIR, THRESHOLDS_FILENAME)
     if os.path.exists(thresholds_path):
         import json
@@ -124,10 +105,8 @@ def main():
     print("Running Evaluation on Job-CV Matching Model")
     print("=" * 80)
     
-    # Explain score matching first
     explain_score_matching()
     
-    # Load model
     print("\n" + "=" * 80)
     print("LOADING MODEL")
     print("=" * 80)
@@ -139,7 +118,6 @@ def main():
         print("[error] Please run scripts/train.py first to train the model")
         return
     
-    # Load test data
     print("\n" + "=" * 80)
     print("LOADING TEST DATA")
     print("=" * 80)
@@ -149,7 +127,6 @@ def main():
     
     print(f"[info] Loaded {len(test_df)} test examples")
     
-    # Make predictions
     print("\n" + "=" * 80)
     print("MAKING PREDICTIONS")
     print("=" * 80)
@@ -176,13 +153,11 @@ def main():
         if true_labels[i]:
             print(f"            True Label: {true_labels[i]}")
     
-    # Evaluate if we have true labels
     if any(true_labels) and all(l is not None for l in true_labels):
         print("\n" + "=" * 80)
         print("EVALUATION METRICS")
         print("=" * 80)
         
-        # Normalize labels to match CLASS_LABELS
         label_map = {
             "no fit": "No Fit",
             "nofit": "No Fit",
@@ -197,13 +172,12 @@ def main():
         for label in true_labels:
             normalized = label_map.get(label.lower(), label)
             if normalized not in CLASS_LABELS:
-                normalized = "No Fit"  # Default fallback
+                normalized = "No Fit"
             normalized_labels.append(normalized)
         
         y_true = np.array(normalized_labels)
         y_pred = np.array(predictions)
         
-        # Compute metrics
         metrics = compute_metrics(y_true, y_pred)
         
         print(f"\nOverall Accuracy: {metrics['accuracy']:.4f}")
@@ -227,7 +201,6 @@ def main():
         print(f"  Recall:    {metrics['weighted_avg']['recall']:.4f}")
         print(f"  F1-Score:  {metrics['weighted_avg']['f1_score']:.4f}")
         
-        # Confusion matrix
         cm = get_confusion_matrix(y_true, y_pred)
         print(f"\nConfusion Matrix:")
         print(f"                Predicted")
@@ -249,4 +222,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -1,19 +1,3 @@
-# scripts/train.py
-"""
-Train a TF-IDF vectorizer for cosine similarity-based job-CV matching.
-
-This script:
-    * loads the structured dataset in data/train.csv
-    * cleans and normalizes the text fields and labels
-    * creates a combined corpus from all resume and job description texts
-    * fits a TF-IDF vectorizer on the combined corpus
-    * splits data into train/validation/test sets
-    * computes similarity scores for validation and test sets
-    * optimizes thresholds using grid search on validation set
-    * evaluates on test set with metrics (precision, recall, F1)
-    * saves the trained vectorizer and optimized thresholds to saved_model/
-"""
-
 import json
 import os
 from typing import Optional, Tuple
@@ -29,7 +13,7 @@ from app.preprocess import clean_text
 
 DATA_PATH = os.path.join("data", "train.csv")
 MODEL_DIR = "saved_model"
-VECTORIZER_FILENAME = "job_match_pipeline.joblib"  # Keep same filename for compatibility
+VECTORIZER_FILENAME = "job_match_pipeline.joblib"
 THRESHOLDS_FILENAME = "thresholds.json"
 CLASS_LABELS = ["No Fit", "Potential Fit", "Good Fit"]
 
@@ -52,17 +36,7 @@ LABEL_NORMALIZATION = {
 }
 
 
-
 def normalize_label(raw: Optional[str]) -> Optional[str]:
-    """
-    Normalize label values to standard format.
-    
-    Args:
-        raw: Raw label value (string, number, or None)
-    
-    Returns:
-        Normalized label: "No Fit", "Potential Fit", "Good Fit", or None if invalid
-    """
     if raw is None or (isinstance(raw, float) and pd.isna(raw)):
         return None
     text = str(raw).strip()
@@ -71,11 +45,6 @@ def normalize_label(raw: Optional[str]) -> Optional[str]:
 
 
 def load_and_preprocess_dataset(path: str) -> pd.DataFrame:
-    """
-    Load and preprocess the training dataset with labels.
-    
-    Returns a DataFrame with cleaned resume and job description texts, and normalized labels.
-    """
     if not os.path.exists(path):
         raise FileNotFoundError(f"Training data not found at {path}")
 
@@ -85,14 +54,11 @@ def load_and_preprocess_dataset(path: str) -> pd.DataFrame:
         missing = ", ".join(sorted(required_cols - set(df.columns)))
         raise ValueError(f"train.csv missing required columns: {missing}")
 
-    # Clean both text fields
     df["resume_clean"] = df["resume_text"].fillna("").apply(clean_text)
     df["job_clean"] = df["job_description_text"].fillna("").apply(clean_text)
     
-    # Normalize labels
     df["label_normalized"] = df["label"].apply(normalize_label)
     
-    # Filter out empty texts and invalid labels
     df = df[
         (df["resume_clean"].str.len() > 0) 
         & (df["job_clean"].str.len() > 0)
@@ -108,15 +74,6 @@ def load_and_preprocess_dataset(path: str) -> pd.DataFrame:
 
 
 def build_vectorizer() -> TfidfVectorizer:
-    """
-    Create and configure a TF-IDF vectorizer.
-    
-    Returns:
-        TfidfVectorizer configured with:
-        - max_features=20000: Top 20,000 features by term frequency
-        - ngram_range=(1, 2): Unigrams and bigrams
-        - stop_words="english": Removes English stopwords
-    """
     return TfidfVectorizer(
         max_features=20000,
         ngram_range=(1, 2),
@@ -125,26 +82,6 @@ def build_vectorizer() -> TfidfVectorizer:
 
 
 def create_combined_corpus(df: pd.DataFrame) -> list:
-    """
-    Create a combined corpus from all resume and job description texts.
-    
-    The corpus is created by concatenating (summing) all resume_text values
-    and all job_description_text values into a single list. This ensures the
-    TF-IDF vectorizer learns the vocabulary and IDF weights from the entire
-    training dataset, providing a consistent feature space for both CV and
-    job description vectors during inference.
-    
-    Args:
-        df: DataFrame with 'resume_clean' and 'job_clean' columns
-    
-    Returns:
-        List of all cleaned texts (resumes + job descriptions)
-    """
-    # Summation: Combine all resume texts and all job description texts
-    # into a single corpus list. This is done by:
-    # 1. Extracting all resume_clean values as a list
-    # 2. Extracting all job_clean values as a list  
-    # 3. Concatenating both lists together
     resume_texts = df["resume_clean"].tolist()
     job_texts = df["job_clean"].tolist()
     combined_corpus = resume_texts + job_texts
@@ -152,9 +89,6 @@ def create_combined_corpus(df: pd.DataFrame) -> list:
 
 
 def save_vectorizer(vectorizer: TfidfVectorizer) -> None:
-    """
-    Save the fitted TF-IDF vectorizer to disk.
-    """
     os.makedirs(MODEL_DIR, exist_ok=True)
     vectorizer_path = os.path.join(MODEL_DIR, VECTORIZER_FILENAME)
     dump(vectorizer, vectorizer_path)
@@ -163,19 +97,6 @@ def save_vectorizer(vectorizer: TfidfVectorizer) -> None:
 
 
 def split_data(df: pd.DataFrame, test_size: float = 0.2, val_size: float = 0.2, random_state: int = 42) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """
-    Split dataset into train, validation, and test sets.
-    
-    Args:
-        df: DataFrame with 'resume_clean', 'job_clean', and 'label' columns
-        test_size: Proportion of data for test set
-        val_size: Proportion of remaining data for validation set
-        random_state: Random seed for reproducibility
-    
-    Returns:
-        Tuple of (train_df, val_df, test_df)
-    """
-    # First split: separate test set
     train_val_df, test_df = train_test_split(
         df,
         test_size=test_size,
@@ -183,8 +104,7 @@ def split_data(df: pd.DataFrame, test_size: float = 0.2, val_size: float = 0.2, 
         stratify=df["label"]
     )
     
-    # Second split: separate train and validation from remaining data
-    val_prop = val_size / (1 - test_size)  # Adjust proportion for remaining data
+    val_prop = val_size / (1 - test_size)
     train_df, val_df = train_test_split(
         train_val_df,
         test_size=val_prop,
@@ -198,16 +118,6 @@ def split_data(df: pd.DataFrame, test_size: float = 0.2, val_size: float = 0.2, 
 def compute_similarity_scores(
     df: pd.DataFrame, vectorizer: TfidfVectorizer
 ) -> np.ndarray:
-    """
-    Compute cosine similarity scores for all resume-job pairs in the dataset.
-    
-    Args:
-        df: DataFrame with 'resume_clean' and 'job_clean' columns
-        vectorizer: Fitted TF-IDF vectorizer
-    
-    Returns:
-        Array of similarity scores (one per row)
-    """
     scores = []
     
     for _, row in df.iterrows():
@@ -223,17 +133,6 @@ def classify_by_threshold(
     potential_threshold: float, 
     good_threshold: float
 ) -> np.ndarray:
-    """
-    Classify similarity scores using thresholds.
-    
-    Args:
-        similarity_scores: Array of similarity scores
-        potential_threshold: Threshold for "Potential Fit" (>= this and < good_threshold)
-        good_threshold: Threshold for "Good Fit" (>= this)
-    
-    Returns:
-        Array of classification labels
-    """
     predictions = []
     for score in similarity_scores:
         if score >= good_threshold:
@@ -252,19 +151,6 @@ def find_optimal_thresholds(
     good_range: Tuple[float, float] = (0.50, 0.90),
     step: float = 0.01
 ) -> Tuple[float, float, float]:
-    """
-    Find optimal thresholds using grid search to maximize weighted F1-score.
-    
-    Args:
-        similarity_scores: Array of similarity scores for validation set
-        true_labels: Array of true labels
-        potential_range: (min, max) range for potential_fit_threshold
-        good_range: (min, max) range for good_fit_threshold
-        step: Step size for grid search
-    
-    Returns:
-        Tuple of (best_potential_threshold, best_good_threshold, best_f1_score)
-    """
     from sklearn.metrics import f1_score
     
     best_f1 = 0.0
@@ -279,7 +165,7 @@ def find_optimal_thresholds(
     for potential_threshold in potential_values:
         for good_threshold in good_values:
             if good_threshold <= potential_threshold:
-                continue  # Skip invalid combinations
+                continue
             
             predictions = classify_by_threshold(similarity_scores, potential_threshold, good_threshold)
             f1 = f1_score(true_labels, predictions, labels=CLASS_LABELS, average='weighted', zero_division=0)
@@ -298,18 +184,6 @@ def evaluate_thresholds(
     potential_threshold: float,
     good_threshold: float
 ) -> dict:
-    """
-    Evaluate thresholds on test set and compute metrics.
-    
-    Args:
-        similarity_scores: Array of similarity scores for test set
-        true_labels: Array of true labels
-        potential_threshold: Threshold for "Potential Fit"
-        good_threshold: Threshold for "Good Fit"
-    
-    Returns:
-        Dictionary with evaluation metrics
-    """
     from sklearn.metrics import (
         accuracy_score,
         precision_recall_fscore_support,
@@ -324,7 +198,6 @@ def evaluate_thresholds(
         true_labels, predictions, labels=CLASS_LABELS, zero_division=0
     )
     
-    # Create per-class metrics
     per_class_metrics = {}
     for i, label in enumerate(CLASS_LABELS):
         per_class_metrics[label] = {
@@ -334,17 +207,14 @@ def evaluate_thresholds(
             "support": int(support[i])
         }
     
-    # Macro averages
     macro_precision = float(np.mean(precision))
     macro_recall = float(np.mean(recall))
     macro_f1 = float(np.mean(f1))
     
-    # Weighted averages
     weighted_precision, weighted_recall, weighted_f1, _ = precision_recall_fscore_support(
         true_labels, predictions, labels=CLASS_LABELS, average='weighted', zero_division=0
     )
     
-    # Confusion matrix
     cm = confusion_matrix(true_labels, predictions, labels=CLASS_LABELS)
     
     return {
@@ -373,15 +243,6 @@ def save_thresholds(
     validation_f1: float,
     test_metrics: dict
 ) -> None:
-    """
-    Save optimized thresholds and evaluation metrics to JSON file.
-    
-    Args:
-        potential_threshold: Optimized potential fit threshold
-        good_threshold: Optimized good fit threshold
-        validation_f1: F1-score on validation set
-        test_metrics: Evaluation metrics from test set
-    """
     os.makedirs(MODEL_DIR, exist_ok=True)
     thresholds_path = os.path.join(MODEL_DIR, THRESHOLDS_FILENAME)
     
@@ -408,38 +269,30 @@ def main():
     print("Training TF-IDF vectorizer for cosine similarity matching")
     print("=" * 60)
     
-    # Load and preprocess dataset with labels
     df = load_and_preprocess_dataset(DATA_PATH)
     print(f"[info] Loaded {len(df)} training examples")
     
-    # Split into train/validation/test sets (60/20/20)
     train_df, val_df, test_df = split_data(df, test_size=0.2, val_size=0.2, random_state=42)
     print(f"[info] Data split:")
     print(f"[info]   Train: {len(train_df)} examples")
     print(f"[info]   Validation: {len(val_df)} examples")
     print(f"[info]   Test: {len(test_df)} examples")
     
-    # Create combined corpus from ALL data (train + val + test) for vectorizer training
-    # This ensures the vectorizer learns from the entire vocabulary
     combined_corpus = create_combined_corpus(df)
     print(f"[info] Created combined corpus with {len(combined_corpus)} documents")
     
-    # Build and fit the TF-IDF vectorizer on the combined corpus
     vectorizer = build_vectorizer()
     print("[info] Fitting TF-IDF vectorizer on combined corpus...")
     vectorizer.fit(combined_corpus)
     print("[info] Vectorizer training complete")
     
-    # Save the fitted vectorizer
     save_vectorizer(vectorizer)
     
-    # Compute similarity scores for validation and test sets
     print("\n[info] Computing similarity scores...")
     val_scores = compute_similarity_scores(val_df, vectorizer)
     test_scores = compute_similarity_scores(test_df, vectorizer)
     print(f"[info] Computed {len(val_scores)} validation scores and {len(test_scores)} test scores")
     
-    # Optimize thresholds on validation set
     print("\n[info] Optimizing thresholds on validation set...")
     val_labels = val_df["label"].values
     best_potential, best_good, best_f1 = find_optimal_thresholds(
@@ -450,7 +303,6 @@ def main():
     print(f"[info]   Good Fit Threshold: {best_good:.4f}")
     print(f"[info]   Validation F1-score: {best_f1:.4f}")
     
-    # Evaluate on test set
     print("\n[info] Evaluating on test set...")
     test_labels = test_df["label"].values
     test_metrics = evaluate_thresholds(
@@ -470,7 +322,6 @@ def main():
         print(f"[info]     F1-score: {metrics['f1_score']:.4f}")
         print(f"[info]     Support: {metrics['support']}")
     
-    # Save thresholds and metrics
     save_thresholds(best_potential, best_good, best_f1, test_metrics)
     
     print("\n[info] Training and optimization pipeline complete")

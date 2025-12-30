@@ -1,12 +1,9 @@
-
 const API_BASE_URL =
   "http://127.0.0.1:8000";
 
 const API_ENDPOINT = "/job-fit";
 
 const USE_MOCK_API = false;
-
-// ================== HELPERS ==================
 
 function showToast(message) {
   const toast = document.getElementById("toast");
@@ -25,7 +22,6 @@ function mapFitLabelToUi(labelRaw) {
 
   const value = String(labelRaw).toLowerCase().trim();
 
-  // Backend returns: "Good Fit", "Potential Fit", or "No Fit"
   if (value === "good fit") {
     return { label: "Good Fit", type: "good-fit" };
   }
@@ -74,8 +70,6 @@ function updateResultUi(mapped, extraMessage) {
   resultSection.classList.remove("hidden");
 }
 
-// ================== API CALL ==================
-
 async function callJobFitApi(file, jobDescription) {
   if (USE_MOCK_API) {
     await new Promise((res) => setTimeout(res, 700));
@@ -86,9 +80,8 @@ async function callJobFitApi(file, jobDescription) {
 
   const formData = new FormData();
 
-  // Field names MUST match backend API exactly:
-  formData.append("resume_text_pdf", file); // Backend expects: resume_text_pdf
-  formData.append("job_description_text", jobDescription); // Backend expects: job_description_text
+  formData.append("resume_text_pdf", file);
+  formData.append("job_description_text", jobDescription);
 
   const response = await fetch(API_BASE_URL + API_ENDPOINT, {
     method: "POST",
@@ -108,8 +101,6 @@ async function callJobFitApi(file, jobDescription) {
 
   return { raw: data, label };
 }
-
-// ================== DOM EVENTS ==================
 
 document.addEventListener("DOMContentLoaded", () => {
   const getStartedBtn = document.getElementById("getStartedBtn");

@@ -1,4 +1,3 @@
-# app/pdf_utils.py
 import pdfplumber
 import re
 from io import BytesIO

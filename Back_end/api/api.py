@@ -1,4 +1,3 @@
-# api/api.py
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -76,14 +75,6 @@ class PredictRequest(BaseModel):
 
 @app.post("/predict_json")
 async def predict_json(payload: PredictRequest):
-    """Accept JSON payload with raw resume text and job description.
-
-    Example JSON:
-    {
-      "resume_text": "...",
-      "job_description_text": "..."
-    }
-    """
     if classifier is None:
         raise HTTPException(
             status_code=503,
