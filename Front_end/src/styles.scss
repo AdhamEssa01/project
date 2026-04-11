@@ -1,3 +1,6 @@
+/* PrimeIcons */
+@import "primeicons/primeicons.css";
+
 /* Reset */
 *,
 *::before,
@@ -10,13 +13,12 @@
 html,
 body {
   height: 100%;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #111827;
   background: #f9fbff;
 }
 
-.imgLogo, 
+.img-logo,
 .phone {
   max-width: 55%;
   display: block;
@@ -44,7 +46,7 @@ button {
   justify-content: center;
 }
 
-.imgLogo {
+.img-logo {
   width: 350px;
   height: auto;
   margin: auto;
@@ -67,17 +69,17 @@ button {
   font-size: 0.95rem;
   box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
   transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
-}
 
-.primary-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.35);
-}
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 30px rgba(79, 70, 229, 0.35);
+  }
 
-.primary-btn:disabled {
-  opacity: 0.6;
-  cursor: default;
-  box-shadow: none;
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+    box-shadow: none;
+  }
 }
 
 .ghost-btn {
@@ -90,10 +92,10 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-}
 
-.ghost-btn:hover {
-  background: #f3f4ff;
+  &:hover {
+    background: #f3f4ff;
+  }
 }
 
 .full-width {
@@ -111,7 +113,7 @@ button {
 
 /* Landing page */
 
-.page-landing .landing-main {
+.landing-main {
   min-height: calc(100vh - 80px);
   display: flex;
   align-items: center;
@@ -134,46 +136,6 @@ button {
   color: #6b7280;
   max-width: 26rem;
   margin-bottom: 1.8rem;
-}
-
-/* Phone mockup */
-
-.phone-mockup {
-  width: 260px;
-  max-width: 80%;
-  margin: 0 auto;
-  border-radius: 2rem;
-  padding: 0.5rem;
-  background: #e5e7eb;
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
-}
-
-.phone-screen {
-  border-radius: 1.7rem;
-  padding: 1.1rem;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.7rem;
-}
-
-.phone-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 999px;
-  background: #c7d2fe;
-}
-
-.phone-lines {
-  height: 10px;
-  width: 100%;
-  border-radius: 999px;
-  background: #e5e7eb;
-}
-
-.phone-lines.short {
-  width: 60%;
 }
 
 /* Analyze page */
@@ -211,12 +173,14 @@ button {
   height: 130px;
   border-radius: 1.25rem;
   background: linear-gradient(145deg, #bfdbfe, #e0e7ff);
+  overflow: hidden;
 }
 
 .avatar {
   max-width: 100%;
   display: block;
 }
+
 /* Form */
 
 .analyze-card {
@@ -248,11 +212,11 @@ button {
   font-size: 0.9rem;
   outline: none;
   background: #ffffff;
-}
 
-.form-input:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.25);
+  &:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.25);
+  }
 }
 
 .file-input {
@@ -275,6 +239,7 @@ button {
 .result-card {
   padding-top: 1rem;
   padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .result-row {
@@ -338,12 +303,6 @@ button {
   z-index: 40;
 }
 
-/* Utility */
-
-.hidden {
-  display: none !important;
-}
-
 /* Responsive */
 
 @media (max-width: 768px) {
@@ -366,6 +325,10 @@ button {
   .bottom-actions {
     justify-content: center;
   }
+
+  .phone {
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 480px) {
@@ -375,9 +338,5 @@ button {
 
   .card {
     padding: 1.2rem;
-  }
-
-  .logo-main {
-    font-size: 1.1rem;
   }
 }

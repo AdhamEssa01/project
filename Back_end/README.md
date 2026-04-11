@@ -35,29 +35,82 @@ uvicorn api.api:app --host 0.0.0.0 --port 8000 --reload
 
 The API automatically loads the saved pipeline on startup.
 
-#### Prediction endpoints and examples
+---
 
-- **Form (PDF upload)**
-  - **Routes (aliases):** `POST /predict_fit`, `POST /predict_job_fit`, `POST /predict`, `POST /job-fit`
-  - **Content type:** `multipart/form-data`
-  - **Fields:**
-    - `resume_text_pdf`: PDF file upload containing the candidate resume (field name is required)
-    - `job_description_text`: form field containing the job description text
-  - **Example (curl):**
+### Endpoints
+
+#### `POST /screen` — Batch recruiter screening *(primary endpoint)*
+
+Accepts one job description and **multiple PDF resumes** in a single request.
+Returns ranked candidates, aggregate statistics, and any per-file extraction
+errors (a bad file does not abort the rest of the batch).
+
+- **Content type:** `multipart/form-data`
+- **Fields:**
+  - `resumes`: one or more PDF files (field name required; max 50 files)
+  - `job_description_text`: the job requirement text (min 30 chars)
 
 ```bash
-curl -X POST "http://localhost:8000/predict_fit" \
-  -F "resume_text_pdf=@/path/to/resume.pdf" \
+curl -X POST "http://localhost:8000/screen" \
+  -F "resumes=@alice.pdf" \
+  -F "resumes=@bob.pdf" \
+  -F "job_description_text=We are looking for a senior data scientist..."
+```
+
+**Example response:**
+
+```json
+{
+  "job_description_preview": "We are looking for a senior data scientist...",
+  "summary": {
+    "total_candidates": 2,
+    "good_fit_count": 1,
+    "potential_fit_count": 1,
+    "no_fit_count": 0,
+    "good_fit_pct": 50.0,
+    "potential_fit_pct": 50.0,
+    "no_fit_pct": 0.0,
+    "top_candidates": ["alice.pdf", "bob.pdf"]
+  },
+  "candidates": [
+    { "filename": "alice.pdf", "rank": 1, "label": "Good Fit",      "score": 0.83, "status": "shortlisted" },
+    { "filename": "bob.pdf",   "rank": 2, "label": "Potential Fit", "score": 0.55, "status": "review"      }
+  ],
+  "errors": []
+}
+```
+
+---
+
+#### `POST /job-fit` — Single CV screening (PDF upload)
+
+Aliases: `/predict_fit`, `/predict_job_fit`, `/predict`
+
+- **Content type:** `multipart/form-data`
+- **Fields:**
+  - `resume_text_pdf`: one PDF file
+  - `job_description_text`: job description text
+
+```bash
+curl -X POST "http://localhost:8000/job-fit" \
+  -F "resume_text_pdf=@resume.pdf" \
   -F "job_description_text=We are looking for a data scientist..."
 ```
 
-- **JSON (raw text)**
-  - **Route:** `POST /predict_json`
-  - **Content type:** `application/json`
-  - **Body:**
-    - `resume_text`: raw resume/CV text (string, required for JSON endpoint)
-    - `job_description_text`: job description text (string)
-  - **Example (curl):**
+**Response:**
+
+```json
+{ "label": "Good Fit", "score": 0.82 }
+```
+
+---
+
+#### `POST /predict_json` — Single CV screening (raw JSON text)
+
+- **Content type:** `application/json`
+- **Body:**
+  - `resume_text`: raw resume text (string)
+  - `job_description_text`: job description text (string)
 
 ```bash
 curl -X POST "http://localhost:8000/predict_json" \
@@ -65,16 +118,22 @@ curl -X POST "http://localhost:8000/predict_json" \
   -d '{"resume_text":"Experienced software engineer...","job_description_text":"Looking for a backend engineer..."}'
 ```
 
-- **Response (both endpoints):** JSON with label and similarity score. Example:
+**Response:**
 
 ```json
-{
-  "label": "Good Fit",
-  "score": 0.82
-}
+{ "label": "Good Fit", "score": 0.82 }
 ```
 
-Note: A `422 Unprocessable Entity` usually means the request did not include required form fields (for example the file field name must be `resume_text_pdf`). A `404 Not Found` means the client called a route that does not exist; the aliases above are provided for compatibility.
+---
 
-All predictions are made strictly using the classifier trained on
-`data/train.csv`; there is no dependency on external scraping or job pools.
+### File upload rules
+
+- **Accepted format:** PDF only (`.pdf`)
+- **Maximum files per `/screen` request:** 50
+- Files that fail to parse are reported in the `errors` array; the rest of the batch continues
+
+### Notes
+
+- A `422 Unprocessable Entity` means a required field is missing or fails validation.
+- A `503 Service Unavailable` means the model has not been loaded yet; run `scripts/train.py`.
+- All predictions are made strictly using the classifier trained on `data/train.csv`.

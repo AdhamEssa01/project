@@ -1,0 +1,240 @@
+{
+  "_analysis_notes": {
+    "last_updated": "2026-04-11",
+    "frontend_scope_note": "The current frontend is an Angular application for single candidate self-checking against one job description. The required frontend direction is a recruiter-facing screening interface where an employer uploads one job requirement and multiple CVs, then reviews ranked results and summary statistics.",
+    "current_frontend_note": "Frontend already has working Angular routing, a landing page, an analysis page, and a real HttpClient integration with the backend single-file endpoint. However, the UI copy, upload flow, result presentation, and data contract are still candidate-oriented rather than employer-oriented.",
+    "important_gaps": [
+      "The frontend file input accepts PDF, DOC, and DOCX, but the backend currently supports PDF extraction only.",
+      "The frontend is wired to a real API for single-file analysis; it is not using a mock store.",
+      "The current result view shows one label/message only and does not expose ranked candidate lists or screening statistics.",
+      "Project instructions mention Angular 20 guidance, while package.json currently uses Angular 21.1.x."
+    ],
+    "status_legend": {
+      "done": "Implemented in the frontend and usable as-is",
+      "partially done": "Some frontend implementation exists, but it is incomplete, misaligned with the required flow, or limited to the current single-candidate experience",
+      "not done": "Required frontend capability does not exist yet"
+    }
+  },
+  "frontend_features": [
+    {
+      "domain": "App Shell and Navigation",
+      "overall_status": "partially done",
+      "features": [
+        {
+          "name": "Angular application bootstrap",
+          "status": "done",
+          "comment": "The application is already bootstrapped with standalone Angular components and router configuration."
+        },
+        {
+          "name": "Landing page route",
+          "status": "done",
+          "comment": "The root route already renders a landing page and the CTA navigates to the analysis screen."
+        },
+        {
+          "name": "Analysis page route",
+          "status": "done",
+          "comment": "A dedicated /analyze route already exists and is connected to the analysis component."
+        },
+        {
+          "name": "Recruiter-specific navigation flow",
+          "status": "not done",
+          "comment": "Routing exists, but the page flow is still designed around a candidate checking one CV rather than an employer screening many candidates for one job."
+        }
+      ]
+    },
+    {
+      "domain": "Landing Experience",
+      "overall_status": "partially done",
+      "features": [
+        {
+          "name": "Visual landing screen",
+          "status": "done",
+          "comment": "The landing page is implemented with branding, hero content, imagery, and a working CTA."
+        },
+        {
+          "name": "Employer-facing product messaging",
+          "status": "not done",
+          "comment": "Current landing copy says 'Find out if a job matches your CV', which targets job seekers instead of recruiters or company owners."
+        },
+        {
+          "name": "Recruiter workflow explanation",
+          "status": "not done",
+          "comment": "There is no explanation of the new workflow: upload job requirements, upload multiple CVs, review ranked results, and inspect summary analytics."
+        }
+      ]
+    },
+    {
+      "domain": "Screening Form",
+      "overall_status": "partially done",
+      "features": [
+        {
+          "name": "Job requirement text input",
+          "status": "done",
+          "comment": "The analysis form already includes a textarea for job description input."
+        },
+        {
+          "name": "Single CV upload",
+          "status": "partially done",
+          "comment": "The form allows selecting a single file and sends it to the backend, but the field labeling implies support for formats the backend does not fully support."
+        },
+        {
+          "name": "Multiple CV upload",
+          "status": "not done",
+          "comment": "The current file input captures only one file. There is no multiple upload flow or candidate batch preparation UI."
+        },
+        {
+          "name": "Structured recruiter fields",
+          "status": "not done",
+          "comment": "There are no dedicated fields for job title, department, location, employment type, or optional recruiter metadata."
+        },
+        {
+          "name": "Frontend file validation",
+          "status": "partially done",
+          "comment": "Basic accept filters exist on the input element, but there is no explicit validation for unsupported file types, empty selections, or per-file errors in a batch flow."
+        },
+        {
+          "name": "Reactive recruiter form model",
+          "status": "not done",
+          "comment": "The screen currently uses template-driven binding for a simple single-candidate form. No recruiter-oriented multi-section or batch-aware form model exists yet."
+        }
+      ]
+    },
+    {
+      "domain": "API Integration",
+      "overall_status": "partially done",
+      "features": [
+        {
+          "name": "Real backend integration",
+          "status": "done",
+          "comment": "The JobFitService uses HttpClient and posts real form-data requests to the backend single-file screening endpoint."
+        },
+        {
+          "name": "Single-candidate API contract usage",
+          "status": "done",
+          "comment": "The analysis component is already wired to the current backend response shape and renders a result after a successful request."
+        },
+        {
+          "name": "Batch screening API integration",
+          "status": "not done",
+          "comment": "No frontend service method or component workflow exists for sending multiple CV files with one job requirement."
+        },
+        {
+          "name": "Environment-based API configuration",
+          "status": "not done",
+          "comment": "The API base URL is currently hardcoded inside the service instead of being managed through Angular environment configuration."
+        },
+        {
+          "name": "Typed recruiter response models",
+          "status": "not done",
+          "comment": "The service only models a minimal single-result payload. There are no interfaces for candidate rows, summary cards, ranking metadata, or per-file failures."
+        }
+      ]
+    },
+    {
+      "domain": "Results and Reporting UI",
+      "overall_status": "partially done",
+      "features": [
+        {
+          "name": "Single result badge display",
+          "status": "done",
+          "comment": "The analysis component already maps the returned label and displays one badge plus a status message."
+        },
+        {
+          "name": "Similarity score display",
+          "status": "not done",
+          "comment": "The backend returns a score, but the current UI does not display or use it."
+        },
+        {
+          "name": "Ranked candidate list",
+          "status": "not done",
+          "comment": "There is no table or list for comparing multiple candidates by score and ranking."
+        },
+        {
+          "name": "Summary statistics cards",
+          "status": "not done",
+          "comment": "The interface does not show totals such as total CVs, shortlisted, under review, rejected, or acceptance percentages."
+        },
+        {
+          "name": "Employer-facing report layout",
+          "status": "not done",
+          "comment": "There is no dashboard-style result presentation suitable for recruiter review or project submission requirements."
+        },
+        {
+          "name": "Export-ready result presentation",
+          "status": "not done",
+          "comment": "The frontend has no CSV export, print view, or report-friendly presentation for screening outcomes."
+        }
+      ]
+    },
+    {
+      "domain": "UX States and Feedback",
+      "overall_status": "partially done",
+      "features": [
+        {
+          "name": "Loading state during analysis",
+          "status": "done",
+          "comment": "The submit button switches to an analyzing state and becomes disabled during the request."
+        },
+        {
+          "name": "Toast-based error feedback",
+          "status": "done",
+          "comment": "The component already shows toast feedback for missing inputs and API failures."
+        },
+        {
+          "name": "Reset workflow",
+          "status": "done",
+          "comment": "The Try Again action clears the current single-result state and form values."
+        },
+        {
+          "name": "Batch progress and per-file feedback",
+          "status": "not done",
+          "comment": "The UI does not support progress reporting, per-file validation messages, or partial failure handling for multi-file screening."
+        },
+        {
+          "name": "Empty-state guidance for recruiter results",
+          "status": "not done",
+          "comment": "There are no dedicated empty, no-results, or no-match states tailored to employer review."
+        }
+      ]
+    },
+    {
+      "domain": "Styling and Frontend Maintainability",
+      "overall_status": "partially done",
+      "features": [
+        {
+          "name": "Responsive baseline layout",
+          "status": "done",
+          "comment": "Global styles already include responsive adjustments for the landing and analysis screens."
+        },
+        {
+          "name": "Component-specific styling structure",
+          "status": "partially done",
+          "comment": "Feature SCSS files exist, but most actual styling is still centralized in the global styles.scss file."
+        },
+        {
+          "name": "Recruiter dashboard visual system",
+          "status": "not done",
+          "comment": "The current design is a simple candidate-focused marketing screen, not a recruiter dashboard or screening workspace."
+        },
+        {
+          "name": "PrimeNG-based UI layer",
+          "status": "not done",
+          "comment": "Project instructions call for PrimeNG usage, but the current UI is built with native HTML elements and custom global CSS."
+        },
+        {
+          "name": "Consistent employer terminology across screens",
+          "status": "not done",
+          "comment": "Labels, CTAs, helper text, and result messaging are still centered on the candidate point of view."
+        }
+      ]
+    }
+  ],
+  "recommended_frontend_execution_order": [
+    "Replace candidate-facing copy with recruiter-facing messaging on the landing and analysis screens.",
+    "Refactor the analysis screen into a recruiter screening form that accepts one job requirement and multiple CV files.",
+    "Update the frontend service layer to call the future batch screening endpoint and model its typed response.",
+    "Add a results dashboard with ranked candidate rows, score visibility, and summary statistic cards.",
+    "Resolve the upload-format mismatch by either restricting the UI to PDF or coordinating with backend DOCX support.",
+    "Move API base configuration out of the service into environment-based configuration and clean up global-vs-component styling boundaries."
+  ]
+}

@@ -1,0 +1,50 @@
+<header class="header">
+  <div class="logo">
+    <img class="img-logo" src="Logo.png" alt="JobFinder logo" />
+  </div>
+</header>
+
+<main class="landing-main">
+  <section class="landing-content container">
+    <div class="landing-text">
+      <p class="landing-eyebrow">AI-Powered Candidate Screening</p>
+      <h1>Screen candidates.<br />Hire the best fit.</h1>
+      <p class="landing-description">
+        Upload your job requirements and multiple CVs — our AI ranks every candidate by
+        relevance so you spend time on the right people, not paperwork.
+      </p>
+      <p-button
+        label="Start Screening"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        (onClick)="startScreening()"
+        styleClass="landing-cta-btn"
+      />
+    </div>
+
+    <div class="landing-illustration">
+      <img class="phone" src="Home.jpg" alt="Recruiter screening illustration" />
+    </div>
+  </section>
+
+  <section class="how-it-works container">
+    <h2 class="how-title">How it works</h2>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-icon"><i class="pi pi-file-edit"></i></div>
+        <h3>1. Paste job requirements</h3>
+        <p>Describe the role you are hiring for in plain text.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon"><i class="pi pi-upload"></i></div>
+        <h3>2. Upload candidate CVs</h3>
+        <p>Select as many PDF resumes as you need — up to 50 at once.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon"><i class="pi pi-chart-bar"></i></div>
+        <h3>3. Review ranked results</h3>
+        <p>Get a scored, ranked shortlist with summary statistics instantly.</p>
+      </div>
+    </div>
+  </section>
+</main>

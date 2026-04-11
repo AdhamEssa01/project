@@ -1,0 +1,151 @@
+<header class="header">
+  <div class="logo">
+    <img class="img-logo" src="Logo.png" alt="JobFinder logo" />
+  </div>
+</header>
+
+@if (result) {
+  <main class="results-main container">
+
+    <!-- Page heading -->
+    <section class="results-heading">
+      <div>
+        <h1>{{ jobTitle }}</h1>
+        @if (result.job_description_preview) {
+          <p class="jd-preview">"{{ result.job_description_preview }}…"</p>
+        }
+      </div>
+      <div class="heading-actions">
+        <p-button
+          label="Screen Again"
+          icon="pi pi-refresh"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="screenAgain()"
+        />
+        <p-button
+          label="Home"
+          icon="pi pi-home"
+          [text]="true"
+          severity="secondary"
+          (onClick)="goHome()"
+        />
+      </div>
+    </section>
+
+    <!-- Summary stat cards -->
+    <section class="stats-grid">
+      <div class="stat-card stat-total">
+        <div class="stat-icon"><i class="pi pi-users"></i></div>
+        <div class="stat-body">
+          <span class="stat-value">{{ result.summary.total_candidates }}</span>
+          <span class="stat-label">Total CVs</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-good">
+        <div class="stat-icon"><i class="pi pi-check-circle"></i></div>
+        <div class="stat-body">
+          <span class="stat-value">{{ result.summary.good_fit_count }}</span>
+          <span class="stat-label">Shortlisted</span>
+          <span class="stat-pct">{{ result.summary.good_fit_pct }}%</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-potential">
+        <div class="stat-icon"><i class="pi pi-clock"></i></div>
+        <div class="stat-body">
+          <span class="stat-value">{{ result.summary.potential_fit_count }}</span>
+          <span class="stat-label">Under Review</span>
+          <span class="stat-pct">{{ result.summary.potential_fit_pct }}%</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-rejected">
+        <div class="stat-icon"><i class="pi pi-times-circle"></i></div>
+        <div class="stat-body">
+          <span class="stat-value">{{ result.summary.no_fit_count }}</span>
+          <span class="stat-label">Rejected</span>
+          <span class="stat-pct">{{ result.summary.no_fit_pct }}%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Per-file errors (if any) -->
+    @if (result.errors.length > 0) {
+      <section class="errors-section">
+        <h2 class="section-title"><i class="pi pi-exclamation-triangle"></i> Files with issues</h2>
+        @for (err of result.errors; track err.filename) {
+          <p-message severity="warn" [text]="err.filename + ': ' + err.error" styleClass="w-full mb-2" />
+        }
+      </section>
+    }
+
+    <!-- Ranked candidate table -->
+    @if (result.candidates.length > 0) {
+      <section class="table-section">
+        <h2 class="section-title"><i class="pi pi-list"></i> Candidate Rankings</h2>
+        <p-table
+          [value]="result.candidates"
+          [tableStyle]="{ 'min-width': '50rem' }"
+          styleClass="p-datatable-sm p-datatable-striped"
+          [rowHover]="true"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th>CV File</th>
+              <th style="width: 12rem">Match Score</th>
+              <th style="width: 9rem">Fit Label</th>
+              <th style="width: 9rem">Status</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-candidate>
+            <tr>
+              <td>
+                <span class="rank-badge" [ngClass]="'rank-' + (candidate.rank <= 3 ? candidate.rank : 'default')">
+                  {{ candidate.rank }}
+                </span>
+              </td>
+              <td>
+                <span class="filename">
+                  <i class="pi pi-file-pdf pdf-icon"></i>
+                  {{ candidate.filename }}
+                </span>
+              </td>
+              <td>
+                <div class="score-cell">
+                  <p-progressBar
+                    [value]="scorePercent(candidate.score)"
+                    [showValue]="false"
+                    styleClass="score-bar"
+                  />
+                  <span class="score-text">{{ candidate.score | number: '1.2-2' }}</span>
+                </div>
+              </td>
+              <td>
+                <p-tag
+                  [value]="candidate.label"
+                  [severity]="labelSeverity(candidate.label)"
+                />
+              </td>
+              <td>
+                <span class="status-pill" [ngClass]="'status-' + candidate.status">
+                  {{ candidate.status }}
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5" class="empty-msg">No candidates were successfully processed.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </section>
+    }
+
+  </main>
+}

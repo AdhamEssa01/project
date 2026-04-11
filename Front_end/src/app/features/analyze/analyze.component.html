@@ -1,0 +1,122 @@
+<p-toast position="bottom-center" />
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">
+      <img class="img-logo" src="Logo.png" alt="JobFinder logo" />
+    </div>
+  </div>
+</header>
+
+<main class="analyze-main container">
+  <section class="analyze-hero">
+    <div class="hero-text">
+      <h1>Screen your candidates</h1>
+      <p class="hero-description">
+        Paste your job requirements, upload multiple CVs, and get a ranked shortlist instantly.
+      </p>
+    </div>
+    <div class="hero-illustration">
+      <div class="hero-avatar">
+        <img class="avatar" src="Human.jpg" alt="AI screening illustration" />
+      </div>
+    </div>
+  </section>
+
+  <section class="card analyze-card">
+    <form class="analyze-form" (ngSubmit)="onSubmit()">
+
+      <!-- Job title (optional) -->
+      <div class="form-group">
+        <label for="jobTitle" class="form-label">Job Title <span class="optional">(optional)</span></label>
+        <input
+          pInputText
+          type="text"
+          id="jobTitle"
+          placeholder="e.g. Senior Data Scientist"
+          [(ngModel)]="jobTitle"
+          name="jobTitle"
+        />
+      </div>
+
+      <!-- Job description -->
+      <div class="form-group">
+        <label for="jobDescription" class="form-label">Job Description <span class="required">*</span></label>
+        <textarea
+          pTextarea
+          id="jobDescription"
+          name="jobDescription"
+          rows="6"
+          placeholder="Paste the full job description here (min. 30 characters)..."
+          [(ngModel)]="jobDescription"
+          autoResize="true"
+        ></textarea>
+      </div>
+
+      <!-- CV file upload -->
+      <div class="form-group">
+        <label class="form-label">
+          Upload CVs (PDF only) <span class="required">*</span>
+          @if (fileCount > 0) {
+            <span class="file-badge">{{ fileCount }} file{{ fileCount > 1 ? 's' : '' }} selected</span>
+          }
+        </label>
+
+        <label for="cvInput" class="file-drop-zone">
+          <i class="pi pi-cloud-upload file-drop-icon"></i>
+          <span>Click to browse or drag PDF files here</span>
+          <span class="file-hint">PDF only · max 50 files</span>
+          <input
+            type="file"
+            id="cvInput"
+            name="cv_files"
+            accept=".pdf"
+            multiple
+            class="hidden-input"
+            (change)="onFileChange($event)"
+          />
+        </label>
+
+        @if (selectedFiles.length > 0) {
+          <ul class="file-list">
+            @for (file of selectedFiles; track file.name; let i = $index) {
+              <li class="file-item">
+                <i class="pi pi-file-pdf file-pdf-icon"></i>
+                <span class="file-name">{{ file.name }}</span>
+                <p-button
+                  icon="pi pi-times"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  size="small"
+                  (onClick)="removeFile(i)"
+                  [attr.aria-label]="'Remove ' + file.name"
+                />
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <p-button
+        type="submit"
+        label="{{ isScreening ? 'Screening...' : 'Screen CVs' }}"
+        icon="{{ isScreening ? 'pi pi-spin pi-spinner' : 'pi pi-search' }}"
+        [disabled]="isScreening"
+        styleClass="w-full"
+      />
+
+      <p class="security-note"><i class="pi pi-lock"></i> Files are processed securely and never stored.</p>
+    </form>
+  </section>
+
+  <section class="bottom-actions">
+    <p-button
+      label="Back to Home"
+      icon="pi pi-home"
+      [text]="true"
+      severity="secondary"
+      (onClick)="goHome()"
+    />
+  </section>
+</main>

@@ -1,0 +1,205 @@
+{
+  "_analysis_notes": {
+    "last_updated": "2026-04-11",
+    "backend_scope_note": "The current backend is a FastAPI inference service for single resume-vs-job-description comparison. The required backend direction is recruiter-side batch CV screening against one job requirement with ranked results and summary statistics.",
+    "current_backend_note": "Backend currently has working model loading, preprocessing, PDF extraction, single-file prediction, and raw-text prediction. Missing core recruiter workflow pieces include batch upload, multi-candidate ranking, DOCX extraction, structured screening summaries, and stronger file validation.",
+    "important_gaps": [
+      "RESOLVED — Frontend now accepts PDF only; backend enforces PDF-only via app/file_utils.py.",
+      "RESOLVED — README and API aliases now aligned; api.py implements /predict_fit, /predict_job_fit, /predict, /job-fit.",
+      "RESOLVED — API responses are now typed via Pydantic schemas in app/schemas.py."
+    ],
+    "status_legend": {
+      "done": "Implemented in the backend and usable as-is",
+      "partially done": "Some backend implementation exists, but it is incomplete, misaligned with the required flow, or not robust enough",
+      "not done": "Required backend capability does not exist yet"
+    },
+    "execution_completed": "2026-04-11",
+    "execution_summary": "All 6 recommended steps executed. New files: app/config.py, app/schemas.py, app/file_utils.py, app/screening_service.py. Modified: api/api.py, README.md, Front_end analyze.component.html."
+  },
+  "backend_features": [
+    {
+      "domain": "API Contracts",
+      "overall_status": "done",
+      "features": [
+        {
+          "name": "Single CV screening endpoint",
+          "status": "done",
+          "comment": "POST /job-fit remains fully backward compatible. Now returns typed SingleFitResponse via Pydantic."
+        },
+        {
+          "name": "Raw text prediction endpoint",
+          "status": "done",
+          "comment": "POST /predict_json remains backward compatible. Uses typed PredictRequest and SingleFitResponse."
+        },
+        {
+          "name": "Recruiter batch screening endpoint",
+          "status": "done",
+          "comment": "POST /screen added in api/api.py. Accepts list[UploadFile] + job_description_text form field. Returns ScreeningResponse."
+        },
+        {
+          "name": "Consistent documented route aliases",
+          "status": "done",
+          "comment": "api.py now registers /predict_fit, /predict_job_fit, /predict as real FastAPI routes. README updated to match."
+        },
+        {
+          "name": "Typed response schemas for screening results",
+          "status": "done",
+          "comment": "app/schemas.py defines CandidateResult, FileError, ScreeningSummary, ScreeningResponse, SingleFitResponse, PredictRequest."
+        }
+      ]
+    },
+    {
+      "domain": "CV File Intake",
+      "overall_status": "done",
+      "features": [
+        {
+          "name": "PDF resume text extraction",
+          "status": "done",
+          "comment": "PDF extraction via pdfplumber in app/pdf_utils.py, now wrapped by app/file_utils.py dispatcher."
+        },
+        {
+          "name": "DOCX resume text extraction",
+          "status": "done",
+          "comment": "Decision taken: PDF-only. app/file_utils.py and frontend accept attribute explicitly restrict to .pdf. DOCX is rejected with a clear error message."
+        },
+        {
+          "name": "Multiple CV file upload handling",
+          "status": "done",
+          "comment": "POST /screen accepts list[UploadFile] up to MAX_FILES=50. app/screening_service.py loops and isolates per-file failures."
+        },
+        {
+          "name": "File-type validation",
+          "status": "done",
+          "comment": "app/file_utils.py validates extension against SUPPORTED_EXTENSIONS from app/config.py. Non-PDF raises ValueError caught per file."
+        },
+        {
+          "name": "Per-file error isolation in batch mode",
+          "status": "done",
+          "comment": "app/screening_service.py catches per-file exceptions and appends FileError objects without aborting the batch."
+        }
+      ]
+    },
+    {
+      "domain": "Employer Screening Workflow",
+      "overall_status": "done",
+      "features": [
+        {
+          "name": "Job requirement text input",
+          "status": "done",
+          "comment": "Both /job-fit and /screen accept job_description_text as a required form field."
+        },
+        {
+          "name": "Resume-to-job scoring",
+          "status": "done",
+          "comment": "Cosine similarity scoring unchanged; now surfaced as score in SingleFitResponse and CandidateResult."
+        },
+        {
+          "name": "Candidate ranking by score",
+          "status": "done",
+          "comment": "app/screening_service.py sorts candidates by score descending and assigns rank (1-based integer)."
+        },
+        {
+          "name": "Recruiter-oriented status mapping",
+          "status": "done",
+          "comment": "CandidateResult.status maps Good Fit→shortlisted, Potential Fit→review, No Fit→rejected."
+        },
+        {
+          "name": "Job requirement metadata support",
+          "status": "partially done",
+          "comment": "Still raw text only. Job title, department, location etc. not in scope for this execution phase. job_description_preview (first 120 chars) is returned for reference."
+        }
+      ]
+    },
+    {
+      "domain": "Reporting and Statistics",
+      "overall_status": "done",
+      "features": [
+        {
+          "name": "Per-request screening summary",
+          "status": "done",
+          "comment": "ScreeningSummary returns total_candidates, good_fit_count, potential_fit_count, no_fit_count, and percentage fields."
+        },
+        {
+          "name": "Accepted vs rejected counts and ratios",
+          "status": "done",
+          "comment": "good_fit_pct, potential_fit_pct, no_fit_pct all computed by app/screening_service._safe_pct()."
+        },
+        {
+          "name": "Top candidates list",
+          "status": "done",
+          "comment": "ScreeningSummary.top_candidates returns filenames of the top 3 candidates by score."
+        },
+        {
+          "name": "Export-ready structured report payload",
+          "status": "done",
+          "comment": "ScreeningResponse is a flat, structured Pydantic model suitable for JSON consumption, CSV generation, or dashboard rendering."
+        }
+      ]
+    },
+    {
+      "domain": "Architecture and Maintainability",
+      "overall_status": "done",
+      "features": [
+        {
+          "name": "Startup model loading",
+          "status": "done",
+          "comment": "Unchanged. Model loaded once at startup."
+        },
+        {
+          "name": "Separation of endpoint and business logic",
+          "status": "done",
+          "comment": "api.py delegates all batch logic to app/screening_service.py. Endpoints are thin."
+        },
+        {
+          "name": "Reusable batch screening service layer",
+          "status": "done",
+          "comment": "app/screening_service.py is stateless and reusable. screen_candidates() is the single entry point."
+        },
+        {
+          "name": "Configurable upload constraints",
+          "status": "done",
+          "comment": "app/config.py centralizes SUPPORTED_EXTENSIONS, MAX_FILES, MIN_JOB_DESCRIPTION_LENGTH, MIN_RESUME_TEXT_LENGTH."
+        }
+      ]
+    },
+    {
+      "domain": "Validation and Reliability",
+      "overall_status": "done",
+      "features": [
+        {
+          "name": "Model availability protection",
+          "status": "done",
+          "comment": "503 guard now in _require_classifier() helper shared by all three prediction endpoints."
+        },
+        {
+          "name": "Graceful PDF parsing failure handling",
+          "status": "done",
+          "comment": "In single-file mode: 400 HTTPException. In batch mode: FileError per file, rest of batch continues."
+        },
+        {
+          "name": "Input quality validation for job requirement text",
+          "status": "done",
+          "comment": "_validate_job_description() strips and checks minimum length (MIN_JOB_DESCRIPTION_LENGTH=30). Returns 422 if too short."
+        },
+        {
+          "name": "Empty extracted resume detection",
+          "status": "done",
+          "comment": "app/file_utils.py checks len(text.strip()) < MIN_RESUME_TEXT_LENGTH and raises ValueError for near-empty extractions."
+        },
+        {
+          "name": "Batch-safe error reporting",
+          "status": "done",
+          "comment": "app/screening_service.py wraps each file in try/except and collects FileError objects. A single bad file never aborts the batch."
+        }
+      ]
+    }
+  ],
+  "recommended_backend_execution_order": [
+    "DONE — Add a recruiter-facing batch endpoint that accepts one job requirement and multiple CV files.",
+    "DONE — Introduce a shared screening service that extracts text, runs scoring, ranks candidates, and builds summary statistics.",
+    "DONE — Restrict uploads to PDF only and align frontend plus README with that decision.",
+    "DONE — Define Pydantic response models for candidate rows, summary statistics, and per-file errors.",
+    "DONE — Add validation for supported extensions, empty extracted text, and basic job requirement quality checks.",
+    "DONE — Align README and route aliases with the real API surface to remove contract drift."
+  ]
+}

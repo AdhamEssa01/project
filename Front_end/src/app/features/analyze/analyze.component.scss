@@ -1,0 +1,95 @@
+:host {
+  display: block;
+}
+
+/* File drop zone */
+.file-drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  border: 2px dashed #c7d2fe;
+  border-radius: 1rem;
+  padding: 2rem 1.5rem;
+  cursor: pointer;
+  background: #f5f3ff;
+  transition: border-color 0.2s, background 0.2s;
+  color: #6b7280;
+  font-size: 0.9rem;
+  text-align: center;
+
+  &:hover {
+    border-color: #4f46e5;
+    background: #eef2ff;
+  }
+}
+
+.file-drop-icon {
+  font-size: 2rem;
+  color: #4f46e5;
+  margin-bottom: 0.25rem;
+}
+
+.file-hint {
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+.hidden-input {
+  display: none;
+}
+
+/* Selected file list */
+.file-list {
+  list-style: none;
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.file-pdf-icon {
+  color: #ef4444;
+  font-size: 1rem;
+}
+
+.file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #374151;
+}
+
+/* Badges */
+.file-badge {
+  margin-left: 0.5rem;
+  background: #4f46e5;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.1rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.optional {
+  font-weight: 400;
+  color: #9ca3af;
+  font-size: 0.82rem;
+}
+
+.required {
+  color: #ef4444;
+}

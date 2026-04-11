@@ -1,0 +1,71 @@
+:host {
+  display: block;
+}
+
+/* Eyebrow label above H1 */
+.landing-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4f46e5;
+  margin-bottom: 0.6rem;
+}
+
+/* CTA button override */
+:host ::ng-deep .landing-cta-btn {
+  font-size: 1rem;
+  padding: 0.85rem 2rem;
+  border-radius: 999px;
+  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+}
+
+/* How it works */
+.how-it-works {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.how-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.step-card {
+  background: linear-gradient(135deg, #f5f3ff, #eff6ff);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+  text-align: center;
+
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0.75rem 0 0.4rem;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+}
+
+.step-icon {
+  font-size: 2rem;
+  color: #4f46e5;
+}
