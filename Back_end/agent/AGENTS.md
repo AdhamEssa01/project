@@ -39,7 +39,7 @@ The current README indicates that:
 - the trained model is saved as a joblib pipeline
 - the API serves prediction endpoints for both PDF-upload and raw-text JSON input
 
-Keep all future work aligned with this architecture unless a task explicitly requires changing it. :contentReference[oaicite:2]{index=2}
+Keep all future work aligned with this architecture unless a task explicitly requires changing it.
 
 # Core Engineering Role
 

@@ -41,8 +41,8 @@ You have two modes of operation:
 
 - Use **standalone components** (no NgModules).
 - Use the **new control flow syntax**: `@if`, `@for`, `@switch`. Do NOT use `*ngIf`, `*ngFor`, etc.
-- Don't use the **signals-based reactivity model**. like `signal()`, `computed()`, `effect()`. Avoid `@Input()`/`@Output()` where signals apply.
-- Use **zoneless change detection** with `provideZonelessChangeDetection()` and `ChangeDetectionStrategy.Signal`.
+- Do not use the **signals-based reactivity model** (like `signal()`, `computed()`, `effect()`). Use traditional `@Input()` and `@Output()` decorators instead of signal inputs.
+- Use **zoneless change detection** with `provideZonelessChangeDetection()` and `ChangeDetectionStrategy.OnPush` if appropriate, but avoid signals.
 - Use `createComponent()` with `inputBinding()`, `outputBinding()`, or `bindings` for dynamic components.
 - Use **TypeScript 5.8+** and assume `strict` mode is enabled.
 - Assume **Angular CLI generates standalone components by default**.
@@ -396,8 +396,6 @@ export interface CommentFilterModel {
 
 4. Testing Requirements:
    - Don't write unit tests
-     caching and error handling for dropdown data loading
-
 # Code Organization Standards
 
 1. File Separation Requirements:
@@ -495,7 +493,7 @@ This structure follows Angular best practices with:
 1. **Base Component Usage**
 
    - All components requiring localization MUST extend the shared BaseComponent from path 'shared/components/base-component/base.component'.
-   - The base component provides the `L` method, which must be used for translating strings in component type script file.
+   - The base component provides the `L` method, which must be used for translating strings in component TypeScript files.
 
 2. **Resource File Structure & Naming**
 

@@ -26,18 +26,6 @@
   <section class="card analyze-card">
     <form class="analyze-form" (ngSubmit)="onSubmit()">
 
-      <!-- Job title (optional) -->
-      <div class="form-group">
-        <label for="jobTitle" class="form-label">Job Title <span class="optional">(optional)</span></label>
-        <input
-          pInputText
-          type="text"
-          id="jobTitle"
-          placeholder="e.g. Senior Data Scientist"
-          [(ngModel)]="jobTitle"
-          name="jobTitle"
-        />
-      </div>
 
       <!-- Job description -->
       <div class="form-group">
@@ -49,7 +37,6 @@
           rows="6"
           placeholder="Paste the full job description here (min. 30 characters)..."
           [(ngModel)]="jobDescription"
-          autoResize="true"
         ></textarea>
       </div>
 
@@ -109,6 +96,18 @@
       <p class="security-note"><i class="pi pi-lock"></i> Files are processed securely and never stored.</p>
     </form>
   </section>
+
+  @if (isScreening) {
+    <div class="loading-overlay">
+      <div class="loading-content">
+        <p-progressSpinner
+          strokeWidth="4"
+          animationDuration="0.8s"
+        />
+        <p class="loading-text">Screening CVs, please wait…</p>
+      </div>
+    </div>
+  }
 
   <section class="bottom-actions">
     <p-button

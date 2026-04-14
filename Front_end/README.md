@@ -1,59 +1,66 @@
-# FrontEnd
+# Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.5.
+This package contains the recruiter-facing Angular application for the Job Fit Classifier workspace. It provides the landing page, the batch CV screening form, and the ranked results dashboard that consumes the FastAPI backend.
 
-## Development server
+For the full project overview, see the [root README](../README.md).
 
-To start a local development server, run:
+## Product Flow
 
-```bash
-ng serve
+- Landing page introduces the screening workflow and routes the user into the app.
+- Analyze page accepts one job description and multiple PDF resumes.
+- Results page shows screening totals, ranked candidates, fit labels, and file-level warnings.
+
+## Tech Stack
+
+- Angular 21 with standalone components and router-based page flow
+- PrimeNG 21 and PrimeIcons for buttons, toast feedback, table, tags, and progress bars
+- Angular `HttpClient` for backend API calls
+
+## API Integration
+
+The frontend uses `src/environments/environment.ts` and currently points to:
+
+```ts
+apiBase: 'http://127.0.0.1:8000'
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+The main service is `src/app/services/job-fit.service.ts`:
 
-## Code scaffolding
+- `screen(files, jobDescription)` -> `POST /screen`
+- `analyze(file, jobDescription)` -> `POST /job-fit`
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## PrimeNG Components In Use
 
-```bash
-ng generate component component-name
-```
+- `p-button` for primary and secondary actions
+- `p-toast` for validation and API error feedback
+- `p-progressSpinner` while screening is in progress
+- `p-table` for ranked candidate results
+- `p-tag` for fit labels
+- `p-progressBar` for candidate match scores
+- `p-message` for warnings such as failed file processing
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Local Development
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Install dependencies and run the Angular dev server:
 
 ```bash
-ng test
+npm install
+npm start
 ```
 
-## Running end-to-end tests
+Open `http://localhost:4200`.
 
-For end-to-end (e2e) testing, run:
+## Build and Test
 
 ```bash
-ng e2e
+npm run build
+npm test
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Relevant Files
 
-## Additional Resources
+- `src/app/features/landing/` - landing page
+- `src/app/features/analyze/` - recruiter batch upload form
+- `src/app/features/results/` - ranked screening results
+- `src/app/services/job-fit.service.ts` - HTTP integration with the backend
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

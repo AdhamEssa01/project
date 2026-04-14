@@ -1,4 +1,47 @@
-/.vscode
-/.venv
+# Workspace and editor settings
+/.vscode/
+.idea/
+
+# Environment files
 /.env
-/.env.example
+/.env.*
+!/.env.example
+
+# Python / FastAPI
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.py,cover
+.python-version
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.venv/
+venv/
+env/
+ENV/
+*.db
+*.sqlite3
+
+# Node / Angular
+node_modules/
+.angular/
+dist/
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,73 @@
+{
+  "plan_metadata": {
+    "title": "UI Refinement: Job Title Removal, Loading State, and Textarea Optimization",
+    "target_package": "frontend",
+    "created_at": "2026-04-14",
+    "author": "gemini",
+    "version": "1.0"
+  },
+  "_analysis_notes": {
+    "summary": "This plan addresses three UI/UX improvements: removing the optional job title field, implementing a more prominent loading state during CV screening, and capping the job description textarea height to prevent layout breaks.",
+    "important_constraints": [
+      "Maintain existing form validation logic",
+      "Ensure the loading overlay is center-aligned and blocks interaction",
+      "Adhere to PrimeNG styling conventions"
+    ],
+    "assumptions": [
+      "The user wants 'loading' to be a full-component overlay rather than just the button state",
+      "A max-height of 400px for the textarea is optimal for standard viewports"
+    ],
+    "risks": [
+      "Z-index conflicts with PrimeNG toast or global elements"
+    ]
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "title": "Remove Job Title from Component Logic",
+      "description": "In AnalyzeComponent (analyze.component.ts), delete the 'jobTitle' property and update the onSubmit method to use a default string (e.g., 'Screening Results') in the navigation state instead of 'this.jobTitle'.",
+      "status": "done",
+      "dependencies": [],
+      "validation": "Check that analyze.component.ts compiles without unused property errors."
+    },
+    {
+      "id": "step-2",
+      "title": "Remove Job Title from Template",
+      "description": "In analyze.component.html, delete the 'form-group' div block (lines 29-40) containing the Job Title label and input field.",
+      "status": "done",
+      "dependencies": [
+        "step-1"
+      ],
+      "validation": "Verify the Job Title field is no longer visible in the UI."
+    },
+    {
+      "id": "step-3",
+      "title": "Implement Loading Overlay Component",
+      "description": "Add a div with class 'loading-overlay' to analyze.component.html, containing a p-progressSpinner and a text status. This overlay should only be visible when 'isScreening' is true.",
+      "status": "done",
+      "dependencies": [],
+      "validation": "Check that the overlay appears when the screen button is clicked."
+    },
+    {
+      "id": "step-4",
+      "title": "Import ProgressSpinnerModule",
+      "description": "Add ProgressSpinnerModule to the imports array in analyze.component.ts.",
+      "status": "done",
+      "dependencies": [
+        "step-3"
+      ],
+      "validation": "The application should compile without template errors for p-progressSpinner."
+    },
+    {
+      "id": "step-5",
+      "title": "Style Loading Overlay and Textarea",
+      "description": "In analyze.component.scss, add styles for '.loading-overlay' (position: fixed, display: flex, background: rgba(255,255,255,0.8), z-index: 1000) and set 'max-height: 400px' with 'overflow-y: auto' for '#jobDescription'.",
+      "status": "done",
+      "dependencies": [
+        "step-2",
+        "step-3"
+      ],
+      "validation": "Verify the overlay covers the form and the textarea does not exceed 400px in height."
+    }
+  ]
+}

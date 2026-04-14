@@ -1,0 +1,74 @@
+{
+  "plan_metadata": {
+    "title": "UI UX Enhancements and Bug Fixes",
+    "target_package": "frontend",
+    "created_at": "2026-04-13",
+    "author": "gemini",
+    "version": "1.0"
+  },
+  "_analysis_notes": {
+    "summary": "Fixes for UI layout issues, dark mode toggle, duplicate buttons, logo styling, and unnecessary scrolling as requested by the user.",
+    "important_constraints": [
+      "Must adhere strictly to Angular and PrimeNG guidelines.",
+      "Must maintain isolated package boundaries."
+    ],
+    "assumptions": [
+      "The 'two buttons' refer to the Start Screening and See Workflow buttons in the hero section.",
+      "Dark mode issue is related to element class toggling or component usage.",
+      "Unnecessary scroll is due to width/height overflows on root layout."
+    ],
+    "risks": [
+      "Layout adjustments might affect mobile view if not tested."
+    ]
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "title": "Fix logo styling",
+      "description": "In `src/app/app.scss`, modify `.brand-mark__logo` to use `object-fit: contain`, remove hardcoded drop shadows, and adjust background to transparent if necessary so the logo integrates naturally.",
+      "status": "pending",
+      "dependencies": [],
+      "validation": "Logo should appear without clipping or strange artifacts."
+    },
+    {
+      "id": "step-2",
+      "title": "Remove unnecessary scroll",
+      "description": "In `src/styles.scss`, add `overflow-x: hidden;` to `body` to prevent the fixed pseudo-elements (`::before`/`::after`) from causing horizontal scrolling. In `src/app/app.scss`, review `.app-shell` to ensure `min-height` and `padding-bottom` don't force a vertical scroll bar when content fits.",
+      "status": "pending",
+      "dependencies": [],
+      "validation": "Window should not show scrollbars when content is shorter than viewport height/width."
+    },
+    {
+      "id": "step-3",
+      "title": "Refine items placement in Hero",
+      "description": "In `src/app/features/landing/landing.component.scss`, adjust `.showcase-float` positions to ensure they stay inside the container. Update media queries so elements do not overlap improperly on small screens.",
+      "status": "pending",
+      "dependencies": [],
+      "validation": "Floating cards on the landing page hero image should not break layout across breakpoints."
+    },
+    {
+      "id": "step-4",
+      "title": "Remove duplicate function button",
+      "description": "In `src/app/features/landing/landing.component.html`, delete the 'See Workflow' button since its functionality is redundant and creates visual clutter alongside 'Start Screening'.",
+      "status": "pending",
+      "dependencies": [],
+      "validation": "Only one primary call-to-action button should remain in the hero."
+    },
+    {
+      "id": "step-5",
+      "title": "Fix dark mode",
+      "description": "In `src/app/app.html`, change the theme toggle from a `<button pButton>` to a proper PrimeNG `<p-button>` component so `[label]` and `[icon]` bindings work correctly with the application state. Ensure PrimeNG is correctly picking up the state switch.",
+      "status": "pending",
+      "dependencies": [],
+      "validation": "Clicking the dark mode button should visibly change the application theme."
+    },
+    {
+      "id": "step-6",
+      "title": "Enhance general Home Screen Aesthetics",
+      "description": "In `src/app/features/landing/landing.component.scss` and `styles.scss`, tweak gradient opacity, typography margins, and glass panel blur effects (`--glass-blur`) to create a more polished, premium look.",
+      "status": "pending",
+      "dependencies": ["step-3"],
+      "validation": "Hero section should feel premium, aligned, and aesthetically cohesive."
+    }
+  ]
+}

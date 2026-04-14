@@ -1,0 +1,45 @@
+{
+  "plan_metadata": {
+    "title": "Documentation Overhaul",
+    "scope": "multi-package",
+    "affected_packages": ["frontend", "backend"],
+    "created_at": "2026-04-14",
+    "author": "gemini",
+    "version": "1.0"
+  },
+  "_analysis_notes": {
+    "summary": "The project lacks a central README.md, and the frontend documentation is purely boilerplate. This plan covers the creation of a root README and the refinement of package-specific documentation to reflect the actual Job Fit Classifier application.",
+    "cross_package_impact": true,
+    "impact_description": "Coordinates documentation across the entire project structure to ensure a unified developer experience.",
+    "risks": []
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "package": "backend",
+      "title": "Create root README.md",
+      "description": "Create a README.md file in the project root directory. Include project name (Job Fit Classifier), high-level architecture (Angular 21 + FastAPI + Logistic Regression), directory structure overview, and quick-start links to each package.",
+      "status": "pending",
+      "dependencies": [],
+      "validation": "Verify root README.md exists and accurately describes the full stack."
+    },
+    {
+      "id": "step-2",
+      "package": "frontend",
+      "title": "Update Frontend documentation",
+      "description": "Comprehensive edit of Front_end/README.md. Replace Angular CLI boilerplate with details about the recruiter-facing batch screening UI, PrimeNG components used, and service integration with the backend API.",
+      "status": "pending",
+      "dependencies": ["step-1"],
+      "validation": "Verify Front_end/README.md describes the recruiter dashboard and batch upload features."
+    },
+    {
+      "id": "step-3",
+      "package": "backend",
+      "title": "Refine Backend documentation",
+      "description": "Update Back_end/README.md to include a 'Project Overview' section linking to the root README.md and ensure all listed endpoints (/screen, /job-fit, /predict_json) match the current codebase.",
+      "status": "pending",
+      "dependencies": ["step-1"],
+      "validation": "Verify Back_end/README.md is consistent with the root documentation and current API state."
+    }
+  ]
+}

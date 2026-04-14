@@ -6,6 +6,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 
@@ -19,6 +20,7 @@ import { FormsModule } from '@angular/forms';
     TextareaModule,
     MessageModule,
     ToastModule,
+    ProgressSpinnerModule,
   ],
   providers: [MessageService],
   templateUrl: './analyze.component.html',
@@ -30,7 +32,6 @@ export class AnalyzeComponent {
   private messageService = inject(MessageService);
 
   selectedFiles: File[] = [];
-  jobTitle = '';
   jobDescription = '';
   isScreening = false;
 
@@ -104,7 +105,7 @@ export class AnalyzeComponent {
         this.router.navigate(['/results'], {
           state: {
             result,
-            jobTitle: this.jobTitle.trim() || 'Screening Results',
+            jobTitle: 'Screening Results',
           },
         });
       },

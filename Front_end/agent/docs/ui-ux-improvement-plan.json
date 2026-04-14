@@ -1,0 +1,78 @@
+{
+  "plan_metadata": {
+    "title": "UI/UX Aesthetic and Interaction Overhaul",
+    "target_package": "frontend",
+    "created_at": "2026-04-13",
+    "author": "gemini",
+    "version": "1.1",
+    "execution_status": "completed",
+    "last_updated": "2026-04-13"
+  },
+  "_analysis_notes": {
+    "summary": "The current application uses a functional but relatively basic implementation of PrimeNG. The objective is to elevate the UI to a 'premium' feel by introducing a curated color palette, shared animations, dark mode support, and refined micro-interactions in the screening workflow.",
+    "important_constraints": [
+      "Must use PrimeNG Aura theme as the base preset",
+      "Angular 21 standalone component architecture must be maintained",
+      "No external heavy animation libraries; use @angular/animations",
+      "Must support mobile responsiveness"
+    ],
+    "assumptions": [
+      "Backend provides scores in numeric format",
+      "PrimeIcons is already integrated and sufficient for current needs"
+    ],
+    "risks": [
+      "Dark mode might require manually overriding some PrimeNG variables if Aura preset defaults aren't enough",
+      "Complex CSS animations might impact scrolling performance on low-end devices"
+    ]
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "title": "Design System Initialization",
+      "description": "Define CSS custom properties in styles.scss for a harmonized color palette, glassmorphism utilities, and shared transition timings.",
+      "status": "done",
+      "dependencies": [],
+      "validation": "Check styles.scss for the new variable definitions."
+    },
+    {
+      "id": "step-2",
+      "title": "Dark Mode Infrastructure",
+      "description": "Create a ThemeService to handle dark/light mode persistence and toggle. Update app.config.ts to enable the darkModeSelector.",
+      "status": "done",
+      "dependencies": ["step-1"],
+      "validation": "Verify that theme state is saved to localStorage and reflected in the document body class."
+    },
+    {
+      "id": "step-3",
+      "title": "Landing Page Aesthetic Overhaul",
+      "description": "Apply glassmorphism to the 'How it works' cards. Add reveal animations on scroll. Update the Hero section with a modern gradient background.",
+      "status": "done",
+      "dependencies": ["step-1"],
+      "validation": "Visually inspect the landing page for 'wow' factor and smooth entrance animations."
+    },
+    {
+      "id": "step-4",
+      "title": "Analyze Component UX Refinement",
+      "description": "Improve the file drop zone with visual feedback on drag. Add a 'Clear All' button for selected files. Implement a multi-step loading indicator for the screening process.",
+      "status": "done",
+      "dependencies": ["step-1"],
+      "validation": "Test file selection workflow and ensuring the loading state provides clear feedback."
+    },
+    {
+      "id": "step-5",
+      "title": "Results Visualization Polish",
+      "description": "Enhance candidate score bars with dynamic color gradients (e.g., green for high score, amber for medium). Implement staggering animations for list items.",
+      "status": "done",
+      "dependencies": ["step-1"],
+      "validation": "Check results list for staggered appearance and intuitive score visualization."
+    },
+    {
+      "id": "step-6",
+      "title": "Universal Layout Polish",
+      "description": "Implement a shared Navbar with the theme toggle and consistent branding across all features. Ensure mobile responsiveness across all views.",
+      "status": "done",
+      "dependencies": ["step-2", "step-3", "step-4", "step-5"],
+      "validation": "Test the application on multiple screen sizes and verify the navbar presence on all routes."
+    }
+  ]
+}

@@ -93,3 +93,36 @@
 .required {
   color: #ef4444;
 }
+
+/* Job description textarea */
+#jobDescription {
+  max-height: 400px;
+  overflow-y: auto;
+  resize: vertical;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loading-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #4f46e5;
+  letter-spacing: 0.01em;
+}

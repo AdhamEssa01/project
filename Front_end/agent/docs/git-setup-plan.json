@@ -1,0 +1,40 @@
+{
+  "plan_metadata": {
+    "title": "Project Root .gitignore Configuration",
+    "scope": "multi-package",
+    "affected_packages": ["frontend", "backend"],
+    "created_at": "2026-04-14",
+    "author": "gemini",
+    "version": "1.0"
+  },
+  "_analysis_notes": {
+    "summary": "The project repository currently lacks a root-level .gitignore file, causing dependencies (node_modules, .venv), build artifacts (dist, __pycache__), and environment variables (.env) to appear as untracked files. This plan outlines the creation of a comprehensive .gitignore to ensure repository cleanliness and security.",
+    "cross_package_impact": true,
+    "impact_description": "Initializes a global ignore policy covering both Angular (Front_end) and Python/FastAPI (Back_end) environments.",
+    "risks": [
+      "Potential loss of .env configuration if not backed up elsewhere (remedied by standard ignore practices)"
+    ]
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "package": "backend",
+      "title": "Create Root .gitignore with Multi-Stack Patterns",
+      "description": "Create a file named '.gitignore' in the project root folder. Add the following patterns: # Node/Angular (node_modules, .angular, dist, *.log), # Python (__pycache__, .venv, env, .env, *.pyc, *.pyo, *.pyd, .db, .sqlite3), # IDE/OS (.vscode, .idea, .DS_Store, Thumbs.db).",
+      "status": "pending",
+      "dependencies": [],
+      "validation": "Check if 'e:/Job Recommendation/Project/.gitignore' exists and contains the specified patterns."
+    },
+    {
+      "id": "step-2",
+      "package": "frontend",
+      "title": "Verify Repository State",
+      "description": "Execute 'git status' and confirm that node_modules, .angular, and Python cache directories are no longer listed as untracked files.",
+      "status": "pending",
+      "dependencies": [
+        "step-1"
+      ],
+      "validation": "Git status output reflects only intentional source files and configuration."
+    }
+  ]
+}
